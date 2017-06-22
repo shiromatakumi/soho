@@ -1,0 +1,74 @@
+<script>
+
+(function(){
+  // トグルメニューを表示非表示
+  var navToggleBtn = document.getElementById('js-nav-toggle-btn');
+  var navBody = document.getElementById('js-nav-toggle');
+  var container = document.getElementById('container-inner');
+  
+
+  navToggleBtn.addEventListener('click',function(){
+    if(container.classList.contains('is-open')) {
+      container.classList.remove('is-open');
+      navBody.classList.remove('is-open');
+    } else {
+      container.classList.add('is-open');
+      navBody.classList.add('is-open');
+    }
+  });
+
+  // 検索ボックスを表示非表示
+  var toggleBtn = document.getElementById('js-search-toggle');
+  var searchBody = document.getElementById('js-search-body');
+  toggleBtn.addEventListener('click',function(){
+    if(searchBody.classList.contains('is-open')) {
+      searchBody.classList.remove('is-open');
+    } else {
+      searchBody.classList.add('is-open');
+    }
+  });
+  /*
+    グローバルナビのJavaScript
+  */
+  var countTime = false;
+  var framePerSecond = 1000 / 60;
+  var mobileHeader = document.getElementById('js-mobile-head');
+  var rect = toggleBtn.getBoundingClientRect();
+  var scrollTop = window.pageYOffset;
+  var offsetTop = rect.top + scrollTop;
+  function fixedNav(){
+    console.log(rect.top);
+    var winWidth = window.outerWidth;
+    if(winWidth < 580) return;
+    
+    var scrollTop = window.pageYOffset;
+    console.log(offsetTop);
+    if(scrollTop>offsetTop+100){
+      mobileHeader.style.position = 'fixed';
+    } else {
+      mobileHeader.style.position = 'relative';
+    }
+  }
+
+  var mobileHeader = document.getElementById('js-mobile-head');
+  var cloneHead = mobileHeader.cloneNode(true);
+  console.log(cloneHead);
+
+
+  /*window.addEventListener('scroll',function(e){
+    throttleNavFunc();
+  });
+  window.addEventListener('resize',function(e){
+    throttleNavFunc();
+  });*/
+  function throttleNavFunc(){
+    // スクロールイベントが多発しすぎないように間引く
+    if(countTime!==false){
+      clearTimeout(countTime);
+    }
+    countTime = setTimeout(function(){
+      fixedNav();
+    }, framePerSecond);
+  }
+}());
+</script>

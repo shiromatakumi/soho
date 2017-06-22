@@ -1,12 +1,23 @@
 <div class="sh-global-nav-wrap">
-  <div class="sh-mobile-head">
-    <div class="sh-mobile-head-toggle-button">
+  <div class="sh-mobile-head" id="js-mobile-head">
+    <div class="sh-mobile-head-toggle-button" id="js-nav-toggle-btn">
       <span></span>
       <span></span>
       <span></span>
     </div>
+    <div class="hatena-module search-box">
+      <div class="sh-search-button" id="js-search-toggle">
+        <i class="blogicon-search"></i>
+      </div>
+      <div class="hatena-module-body" id="js-search-body">
+        <form class="search-form" name="search" role="search" action="http://soho.hateblo.jp/search" method="get">
+        <input type="text" name="q" class="search-module-input" value="" placeholder="ブログ内検索" required>
+        <input type="submit" value="検索" class="search-module-button" />
+        </form>
+      </div>
+    </div>
   </div>
-  <nav class="sh-global-nav">
+  <nav class="sh-global-nav" id="js-nav-toggle">
     <ul class="sh-global-nav-list">
       <li class="sh-global-nav-item has-child"><a href="">category1</a>
         <ul class="sh-global-nav-children">
