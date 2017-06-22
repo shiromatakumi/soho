@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+<div class="wrapper">
+  <div id="nav-tool-area">
+    <div id="js-textarea" class="textarea-wrap">
+      <div class="textarea-item">
+        <p>親カテゴリー1</p>
+        <div class="url-section"><textarea id="url-1" class="text-url" placeholder="URL" wrap="off">http://shiromatakumi.hatenablog.com/archive/category/%E6%B4%8B%E6%A5%BD</textarea></div><div class="cat-section"><textarea id="cat-1" class="text-cat" placeholder="カテゴリー名など" wrap="off">洋楽</textarea></div>
+        <div class="buttons">
+          <button id="add-child-1" class="add-child" value="1">+</button><button id="remove-child-1" class="remove-child" value="1">-</button><p class="add-or-remove" style="">親カテゴリー1の子を追加・削除</p><div id="child-1"></div>
+        </div>
+      </div>
+    </div>
+    <button id="add-parent-1" class="add-parent" value="1">+ 親カテゴリーを追加する</button><button id="remove-parent-1" class="remove-parent" value="1">- 親カテゴリーを削除する</button><div id="parent-1"></div>
+  </div>
+  <div class="btn-section">
+    <button id="js-get-code">コードを生成する</button>
+  </div>
+  <div class="result">
+    <textarea id="get-html-code"></textarea>
+  </div>
+</div>
+
+<!--[if lt IE 9]>
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.3.min.js"></script>
+<![endif]-->
+<!--[if gte IE 9]><!-->
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.2.3.min.js"></script>
+<!--<![endif]-->
+<script>
+$(function(){
+  var obj = [];
+  var childObj = [];
+  var countParent = 2;
+  $('#nav-tool-area').on('click', '.add-parent', function(){
+    var textArea = '';
+    console.log('click');
+    textArea += '<div class="textarea-item"><p>親カテゴリー'+countParent+'</p><div class="url-section"><textarea id="url-'+countParent+'" class="text-url" placeholder="URL" wrap="off"></textarea></div>';
+    textArea += '<div class="cat-section"><textarea id="cat-'+countParent+'" class="text-cat" placeholder="カテゴリー" wrap="off"></textarea></div>';
+    textArea += '<div class="buttons"><button id="add-child-'+countParent+'" class="add-child">+</button><button id="remove-child-'+countParent+'" class="remove-child">-</button><p class="add-or-remove">親カテゴリー'+countParent+'の子を追加・削除</p>';
+    textArea += '<div id="child-'+countParent+'"></div></div>';
+    $('#js-textarea').append(textArea);
+    countParent++;
+  });
+  $('#nav-tool-area').on('click', '.remove-parent', function(){
+    if(countParent>2) {
+      $('.textarea-item:last-child').remove();
+      countParent--;
+    }
+  });
+  // 子カテゴリーのテキストエリアを生成
+  $('#js-textarea').on('click', '.add-child', function(){
+    var id = this.id;
+    var childId = id.replace(/add-/g,"");
+    $('#'+childId).append('<div class="child-textarea-item"><textarea class="child-text-url"  placeholder="URL" wrap="off"></textarea><textarea class="child-text-cat" placeholder="カテゴリー" wrap="off"></textarea></div>');
+  });
+  $('#js-textarea').on('click', '.remove-child', function(){
+    var id = this.id;
+    var childId = id.replace(/remove-/g,"");
+    var children = $('#'+childId);
+    if(children[0].lastChild != null) children[0].lastChild.remove();
+  });
+
+  $('#js-get-code').click(function(){
+    // if(!inputCheck()) return;
+    obj = [];　//　一旦初期化
+    var data = [];
+    var $item = $('.textarea-item');
+    var num = 0;
+    var $textareaItem = $('.textarea-item');
+    var ul = '<div class="sh-global-nav" id="js-global-nav">\n';
+    ul += '  <div class="sh-toggle-btn" id="js-toggle-btn">\n';
+    ul += '    <span class="line-1"></span>\n';
+    ul += '    <span class="line-2"></span>\n';
+    ul += '    <span class="line-3"></span>\n';
+    ul += '  </div>\n';
+    ul += '  <ul>\n';
+    $textareaItem.each(function(index){
+      data = [];　//　一旦初期化
+      var $parent = $(this);
+      var url = $parent.find('.text-url').val();
+      var cat = $parent.find('.text-cat').val();
+      data.push(url);
+      data.push(cat);
+      var $children = $parent.find('.child-textarea-item');
+      $children.each(function(i){
+        var childObj = [];
+        var childUrl = $(this).find('.child-text-url').val();
+        var childCat = $(this).find('.child-text-cat').val();
+        childObj.push(childUrl);
+        childObj.push(childCat);
+        data.push(childObj);
+      });
+      obj.push(data);
+    });
+    
+    for(var i=0;i<obj.length;i++){
+      var parentUrlItem = obj[i][0];
+      var parentCatItem = obj[i][1];
+      if (obj[i].length > 2) {
+        ul += '    <li class="has-child">\n      <a href="'+parentUrlItem+'">'+parentCatItem+'</a>\n';
+        ul += '      <ul class="sh-global-nav-children">\n';
+        for(var j=2;j<obj[i].length;j++){
+          var childUrlItem = obj[i][j][0];
+          var childCatItem = obj[i][j][1];
+          ul += '        <li>\n          <a href="'+childUrlItem+'">'+childCatItem+'</a>\n        </li>\n';
+        }
+        ul += '      </ul>\n    </li>\n';
+      } else {
+        ul += '    <li>\n      <a href="'+parentUrlItem+'">'+parentCatItem+'</a>\n    </li>\n';
+      }
+    }
+    ul += '  </ul>\n</div>\n<div class="black-back" id="js-black-back"></div>';
+    // 新たにHTMLを生成する
+    var textUl = '<!-- グローバルナビのHTML -->\n'+ul+'\n<!-- グローバルナビのHTMLここまで -->';
+    document.getElementById('get-html-code').innerHTML = textUl;
+  });
+  // 入力チェック
+  function inputCheck(){
+    var bool;
+    $('#textarea-section textarea').each(function(index){
+      if(index === $('#textarea-section textarea').length-1) {
+        if(this.value==='') {
+          document.getElementById('error-msg').innerHTML = '<p>未入力の項目があります。</p>';
+          return bool = false;
+        } else {
+          document.getElementById('error-msg').innerHTML = '';
+          return bool = true;
+        }
+      } else {
+        if(this.value==='') {
+          document.getElementById('error-msg').innerHTML = '<p>未入力の項目があります。</p>';
+          return bool = false;
+        }
+      }
+    });
+    return bool;
+  }
+});
+
+</script>
+</body>
+</html>
