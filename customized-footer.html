@@ -1,23 +1,58 @@
 <script>
-
 (function(){
-  // トグルメニューを表示非表示
+  // メニューを表示非表示
   var navToggleBtn = document.getElementById('js-nav-toggle-btn');
   var navBody = document.getElementById('js-nav-toggle');
+  var mobileHeader = document.getElementById('js-mobile-head');
+  var blackBack = document.getElementById('js-close-nav');
   var container = document.getElementById('container-inner');
-  
+  // classを操作したい要素たちをまとめる
+  var elemObj = [navToggleBtn,navBody,blackBack,container,mobileHeader];
 
   navToggleBtn.addEventListener('click',function(){
     if(container.classList.contains('is-open')) {
-      container.classList.remove('is-open');
-      navBody.classList.remove('is-open');
+      removeClassOpen();
     } else {
-      container.classList.add('is-open');
-      navBody.classList.add('is-open');
+      addClassOpen();
     }
   });
+  blackBack.addEventListener('click',function(){
+    removeClassOpen();
+  });
 
-  // 検索ボックスを表示非表示
+  var frameTime = 1000 / 60;
+  var timer = false;
+  var winWidth;
+
+  function resizeEvent(){
+    // スクロールイベントが多発しすぎないように間引く
+    if(timer!==false){
+      clearTimeout(timer);
+    }
+    timer = setTimeout(function(){
+      winWidth = window.outerWidth;
+      if(winWidth>768) removeClassOpen();
+    }, frameTime);
+  }
+
+  window.addEventListener('resize',function(){
+    resizeEvent();
+  });
+
+  function removeClassOpen(){
+    for(var i=0;i<elemObj.length;i++){
+      elemObj[i].classList.remove('is-open');
+    }
+    navToggleBtn.classList.add('is-close');
+  }
+  function addClassOpen(){
+    for(var i=0;i<elemObj.length;i++){
+      elemObj[i].classList.add('is-open');
+    }
+    navToggleBtn.classList.remove('is-close');
+  }
+
+  // 検索ボックスを表示・非表示
   var toggleBtn = document.getElementById('js-search-toggle');
   var searchBody = document.getElementById('js-search-body');
   toggleBtn.addEventListener('click',function(){
@@ -27,48 +62,62 @@
       searchBody.classList.add('is-open');
     }
   });
-  /*
-    グローバルナビのJavaScript
-  */
-  var countTime = false;
-  var framePerSecond = 1000 / 60;
-  var mobileHeader = document.getElementById('js-mobile-head');
-  var rect = toggleBtn.getBoundingClientRect();
-  var scrollTop = window.pageYOffset;
-  var offsetTop = rect.top + scrollTop;
-  function fixedNav(){
-    console.log(rect.top);
-    var winWidth = window.outerWidth;
-    if(winWidth < 580) return;
-    
-    var scrollTop = window.pageYOffset;
-    console.log(offsetTop);
-    if(scrollTop>offsetTop+100){
-      mobileHeader.style.position = 'fixed';
-    } else {
-      mobileHeader.style.position = 'relative';
-    }
+}());
+/*
+  シェア数をカウントするJS
+*/
+// コールバック関数
+function getJson(json) {
+  var hatebuCount = json;
+  var allSelector = document.getElementsByClassName('sh-hatebu-count');
+  for(var i=0;i<allSelector.length;i++){
+    allSelector[i].innerHTML = hatebuCount;
   }
-
-  var mobileHeader = document.getElementById('js-mobile-head');
-  var cloneHead = mobileHeader.cloneNode(true);
-  console.log(cloneHead);
-
-
-  /*window.addEventListener('scroll',function(e){
-    throttleNavFunc();
-  });
-  window.addEventListener('resize',function(e){
-    throttleNavFunc();
-  });*/
-  function throttleNavFunc(){
-    // スクロールイベントが多発しすぎないように間引く
-    if(countTime!==false){
-      clearTimeout(countTime);
+}
+//　ここは即時関数で他のコードに影響が出ない様に。
+(function(){
+  var now = new Date();
+  var url = location.href;
+  getResponse("//graph.facebook.com/?id=",'sh-facebook-count','json',callbackFb);
+  // はてブのjsonpを受け取る
+  var script = document.createElement('script');
+  script.src = 'http://api.b.st-hatena.com/entry.count?url='+encodeURIComponent(url)+'&callback=getJson&timestamp='+now.getTime();
+  document.body.appendChild(script);
+  // 通信用の関数（あとで再利用するかもなので関数化）
+  function getResponse(reqUrl,selector,type,callback){
+    var data = null;
+    var xhr = new XMLHttpRequest();
+    xhr.ontimeout = function() {
+      xhr.abort(); // 中止
+      callback(data,selector);
+    };
+    // 通信エラー時の処理
+    xhr.onerror = function(){callback(data,selector);};
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState == 4 ) {
+        if(xhr.status == 200) {
+          data = xhr.response;
+        }
+        callback(data,selector);
+      }
     }
-    countTime = setTimeout(function(){
-      fixedNav();
-    }, framePerSecond);
+    xhr.open('GET',reqUrl+encodeURIComponent(url),true);
+    xhr.timeout = 15000 ;
+    xhr.responseType = type;
+    xhr.send();
+  }
+  // 各SNSのコールバック関数
+  function callbackFb(obj,selector) {
+    var allSelector = document.getElementsByClassName(selector);
+    if(!obj.share || !obj.share.share_count) {
+      for(var i=0;i<allSelector.length;i++){
+        allSelector[i].innerHTML = 0;
+      }
+    } else {
+      for(var i=0;i<allSelector.length;i++){
+        allSelector[i].innerHTML = obj.share.share_count;
+      }
+    }
   }
 }());
 </script>

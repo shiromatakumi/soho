@@ -69,18 +69,20 @@ $(function(){
 
   $('#js-get-code').click(function(){
     // if(!inputCheck()) return;
+    var sitename ='';
+    var siteUrl = '';
     obj = [];　//　一旦初期化
     var data = [];
     var $item = $('.textarea-item');
     var num = 0;
     var $textareaItem = $('.textarea-item');
-    var ul = '<div class="sh-global-nav" id="js-global-nav">\n';
-    ul += '  <div class="sh-toggle-btn" id="js-toggle-btn">\n';
-    ul += '    <span class="line-1"></span>\n';
-    ul += '    <span class="line-2"></span>\n';
-    ul += '    <span class="line-3"></span>\n';
-    ul += '  </div>\n';
-    ul += '  <ul>\n';
+
+    var ul = '<div class="sh-global-nav-wrap">\n<div class="sh-mobile-head" id="js-mobile-head">\n<div class="sh-mobile-head-toggle-button" id="js-nav-toggle-btn">\n<span></span><span></span><span></span>\n</div>\n'
+
+    if (sitename != undefined) ul += '<div class="sh-site-name">\n<p><a href="'+siteUrl+'"></a>'+sitename+'</p>\n</div>\n';
+
+    ul += '<div class="hatena-module search-box">\n<div class="sh-search-button" id="js-search-toggle">\n<i class="blogicon-search"></i>\n</div>\n<div class="hatena-module-body sh-search-module" id="js-search-body">\n<form class="search-form" name="search" role="search" action="'+siteUrl+'/search" method="get">\n<input type="text" name="q" class="search-module-input" value="" placeholder="ブログ内検索" required>\n<input type="submit" value="検索" class="search-module-button" />\n</form>\n</div>\n</div>\n</div>\n<nav class="sh-global-nav" id="js-nav-toggle">\n';
+    ul += '<ul class="sh-global-nav-list">\n';
     $textareaItem.each(function(index){
       data = [];　//　一旦初期化
       var $parent = $(this);
@@ -104,19 +106,19 @@ $(function(){
       var parentUrlItem = obj[i][0];
       var parentCatItem = obj[i][1];
       if (obj[i].length > 2) {
-        ul += '    <li class="has-child">\n      <a href="'+parentUrlItem+'">'+parentCatItem+'</a>\n';
-        ul += '      <ul class="sh-global-nav-children">\n';
+        ul += '<li class="sh-global-nav-item has-child">\n<a href="'+parentUrlItem+'">'+parentCatItem+'</a>\n';
+        ul += '<ul class="sh-global-nav-children">\n';
         for(var j=2;j<obj[i].length;j++){
           var childUrlItem = obj[i][j][0];
           var childCatItem = obj[i][j][1];
-          ul += '        <li>\n          <a href="'+childUrlItem+'">'+childCatItem+'</a>\n        </li>\n';
+          ul += '<li>\n<a href="'+childUrlItem+'">'+childCatItem+'</a>\n</li>\n';
         }
-        ul += '      </ul>\n    </li>\n';
+        ul += '</ul>\n</li>\n';
       } else {
-        ul += '    <li>\n      <a href="'+parentUrlItem+'">'+parentCatItem+'</a>\n    </li>\n';
+        ul += '<li class="sh-global-nav-item">\n<a href="'+parentUrlItem+'">'+parentCatItem+'</a>\n</li>\n';
       }
     }
-    ul += '  </ul>\n</div>\n<div class="black-back" id="js-black-back"></div>';
+    ul += '</ul>\n</nav>\n</div>\n<div class="sh-black-back" id="js-close-nav"></div>';
     // 新たにHTMLを生成する
     var textUl = '<!-- グローバルナビのHTML -->\n'+ul+'\n<!-- グローバルナビのHTMLここまで -->';
     document.getElementById('get-html-code').innerHTML = textUl;
