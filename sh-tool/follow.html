@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./style.css">
+  <style>
+    .entry-content .section {
+      margin-bottom: 60px;
+    }
+    .entry-content button {
+      margin-right: 8px;
+      margin-bottom: 8px;
+      background-color: #2ead9f;
+      border: none;
+      border-radius: 4px;
+      min-width: 50px;
+      cursor: pointer;
+      box-shadow: 1px 1px 1px rgba(0,0,0,.2);
+      outline: none;
+      padding: 4px 10px;
+      color: #fff;
+      appearance: none;
+    }
+    .entry-content textarea {
+      resize: none;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      margin-bottom: 2px;
+      width: 98%;
+    }
+    .entry-content .account-form p {
+      margin: 6px 0;
+    }
+    .entry-content .account-form .small {
+      font-size: 14px;
+      color: #666;
+    }
+    .entry-content .result textarea {
+      height: 260px;
+    }
+    .btn-section button {
+      margin-bottom: 40px;
+      background-color: #ad2e52;
+    }
+  </style>
+</head>
+<body>
+<div class="entry-content">
+  <section class="section">
+    <h3>WEBアイコンを使えるようにする</h3>
+    <p>以下のコードを、詳細設定→「headに要素を追加」にコピペ</p>
+    <textarea><link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"></textarea>
+  </section>
+  <section id="select-button-section" class="section">
+    <div id="select-button" class="select-button">
+      <h3>利用するフォローボタンを選んで下さい。</h3>
+      <form id="js-check-follow">
+      <input type="checkbox" name="riyu" value="hatena" checked="checked">はてなブログ読者
+      <input type="checkbox" name="riyu" value="twitter" checked="checked">Twitter
+      <input type="checkbox" name="riyu" value="facebook" checked="checked">Facebook
+      <input type="checkbox" name="riyu" value="instagram" checked="checked">Instagram
+      <input type="checkbox" name="riyu" value="feedly" checked="checked">Feedly
+      <input type="checkbox" name="riyu" value="googleplus" checked="checked">Google+ 
+      </form>
+    </div><!-- /select-button -->
+  </section>
+  <section id="account-form-section" class="section">
+    <div class="account-form" id="account-form">
+      <h3>必要な情報を入力して下さい。</h3>
+      <div class="text-item" id="info-base">
+        <p>はてなブログのURL（Feedlyにも使用）</p>
+        <p class="small">最後のスラッシュ（/）は不要<br>(http://soho.hateblo.jp/　→　http://soho.hateblo.jp)</p>
+        <textarea name="" id="hatena-url" class="text-long">http://shiromatakumi.hatenablog.com</textarea>
+      </div>
+      <div class="text-item" id="info-hatena">
+        <p>はてなid</p>
+        <textarea name="" id="hatena-id">shiromatakumi</textarea>
+      </div>
+      <div class="text-item" id="info-twitter">
+        <p>Twitterのアカウント</p>
+        <textarea name="" id="twitter-account">made_mode</textarea>
+      </div>
+      <div class="text-item" id="info-facebook">
+        <p>FacebookページURL</p>
+        <p class="small">最後のスラッシュ（/）は不要<br>(https://www.facebook.com/soho/　→　https://www.facebook.com/soho)</p>
+        <textarea name="" id="facebook-url" class="text-long">https://www.facebook.com/shiromatakumi</textarea>
+      </div>
+      <div class="text-item" id="info-instagram">
+        <p>Instagramのアカウント</p>
+        <textarea name="" id="instagram-account">shiroma_takumi</textarea>
+      </div>
+      <div class="text-item" id="info-googleplus">
+        <p>Google+の自分のプロフィールのURL</p>
+         <p class="small">最後のスラッシュ（/）は不要</p>
+        <textarea name="" id=googleplus-url class="text-long">https://plus.google.com/104891082434894101789</textarea>
+      </div>
+    </div>
+  </section>
+  <div class="btn-section">
+    <button id="js-get-code">コードを生成する</button>
+  </div>
+  <div class="result">
+    <form><textarea id="get-html-code"></textarea></form>
+  </div>
+</div>
+<!--[if lt IE 9]>
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.3.min.js"></script>
+<![endif]-->
+<!--[if gte IE 9]><!-->
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.2.3.min.js"></script>
+<!--<![endif]-->
+<script>
+$(function(){
+  var typeNum = 1;
+  var buttonNum = 6;
+
+  $('#js-check-follow').change(function(){
+    buttonNum = 0;
+    $('#js-check-follow input').each(function(){
+      var sortId = '#sort-'+ this.value;
+      var formId = '#info-'+ this.value;
+      if($(this).is(':checked')) {
+        changeShow(sortId);
+        changeShow(formId);
+        buttonNum++;
+      } else {
+        changeHide(sortId);
+        changeHide(formId);
+      }
+    });
+    console.log(buttonNum);
+  });
+
+  function changeShow(selector){
+    $(selector).show().addClass('is-checked');
+  }
+  function changeHide(selector){
+    $(selector).hide().removeClass('is-checked');
+  }
+
+
+  $('#js-get-code').click(function(){
+    var hatenaUrl = document.getElementById('hatena-url').value
+        hatenaId = document.getElementById('hatena-id').value,
+        twitterAccount = document.getElementById('twitter-account').value,
+        facebookUrl = document.getElementById('facebook-url').value,
+        instagramAccount = document.getElementById('instagram-account').value,
+        googleplusUrl = document.getElementById('googleplus-url').value,
+        hatenaUrlreName = hatenaUrl.replace(/http:\/\//g,"");
+
+    var resultHtml = '<!-- フォローボタン -->\n<div class="sh-follow-btn-small">\n<p>フォローする</p>\n<div class="sh-follow-btn-inner">\n';
+    var htmlObj = {
+      'hatena' : '<a class="hatena" href="http://blog.hatena.ne.jp/'+hatenaId+'/'+hatenaUrlreName+'/subscribe" target="_blank"><i class="blogicon-hatenablog lg"></i></a>\n',
+      'twitter' : '<a class="twitter" href="https://twitter.com/intent/follow?screen_name='+twitterAccount+'" target="_blank"><i class="fa fa-twitter"></i></a>\n',
+      'facebook' : '<a class="facebook" href="'+facebookUrl+'" target="_blank"><i class="fa fa-facebook-square"></i></a>\n',
+      'instagram' : '<a class="instagram" href="https://www.instagram.com/'+instagramAccount+'" target="_blank"><i class="fa fa-instagram"></i></a>\n',
+      'feedly' : '<a class="feedly" href="http://feedly.com/i/subscription/feed/'+hatenaUrl+'/feed" target="_blank"><i class="fa fa-rss"></i></a>\n',
+      'googleplus' : '<a class="googleplus" href="'+googleplusUrl+'" target="_blank"><i class="fa-google-plus fa"></i></a>\n'
+    };
+
+    $('#js-check-follow input').each(function(){
+      if($(this).is(':checked')){
+        var result = this.value;
+        resultHtml += htmlObj[result];
+      }
+    });
+    
+
+    resultHtml += '</div>\n</div>\n<!-- フォローボタンここまで -->';
+
+    document.getElementById('get-html-code').innerHTML = resultHtml;
+
+    var codeId = 'follow-button-style-type-'+typeNum;
+  });
+});
+</script>
+
+</body>
+</html>

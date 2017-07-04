@@ -8,7 +8,6 @@
   var container = document.getElementById('container-inner');
   // classを操作したい要素たちをまとめる
   var elemObj = [navToggleBtn,navBody,blackBack,container,mobileHeader];
-
   navToggleBtn.addEventListener('click',function(){
     if(container.classList.contains('is-open')) {
       removeClassOpen();
@@ -24,20 +23,41 @@
   var timer = false;
   var winWidth;
 
-  function resizeEvent(){
+  function scrollEvent(){
     // スクロールイベントが多発しすぎないように間引く
     if(timer!==false){
       clearTimeout(timer);
     }
     timer = setTimeout(function(){
       winWidth = window.outerWidth;
-      if(winWidth>768) removeClassOpen();
+      if(winWidth>768) {
+        removeClassOpen();
+      } else {
+        showTitle();
+      }
     }, frameTime);
   }
 
   window.addEventListener('resize',function(){
-    resizeEvent();
+    scrollEvent();
   });
+  window.addEventListener('scroll',function(){
+    scrollEvent();
+  });
+
+  var title = document.getElementById('title');
+  var siteName = document.getElementById('js-sitename');
+  function showTitle(){
+    var titleRect = title.getBoundingClientRect();
+    var scrollTop = window.pageYOffset;
+    var offsetTop = titleRect.top + scrollTop;
+    if(offsetTop+100<scrollTop){
+      siteName.classList.add('is-show');
+    } else {
+      siteName.classList.remove('is-show');
+    }
+  }
+  showTitle();
 
   function removeClassOpen(){
     for(var i=0;i<elemObj.length;i++){
@@ -56,6 +76,7 @@
   var toggleBtn = document.getElementById('js-search-toggle');
   var searchBody = document.getElementById('js-search-body');
   toggleBtn.addEventListener('click',function(){
+
     if(searchBody.classList.contains('is-open')) {
       searchBody.classList.remove('is-open');
     } else {
